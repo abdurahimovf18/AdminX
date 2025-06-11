@@ -1,0 +1,34 @@
+server:
+  workers: 2               # Number of Gunicorn worker processes (handle concurrent requests)
+  threads: 1               # Threads per worker (useful for I/O-bound work)
+  timeout: 60              # Max seconds to wait before killing a stalled request
+  keep_alive: 5            # Keep-alive duration for HTTP connections (in seconds)
+
+logging:
+  level: info              # Logging level: debug, info, warning, error, critical
+  format: json             # Log output format: 'json' or 'text' (machine-friendly vs human-readable)
+
+  file:
+    enable: true           # Enable file logging (recommended for production)
+    max_size: 10           # Rotate file after reaching this size (in megabytes)
+    backups: 3             # Number of rotated log files to keep
+
+  console:
+    enable: false          # Enable console logging (disable in production to reduce noise) 
+
+docs:
+  swagger_url: /swagger    # URL path to access Swagger UI (main API documentation)
+  redoc_url: /redoc        # URL path to access ReDoc UI (alternative API docs)
+  openapi_url: /openapi.json  # Path to OpenAPI schema (used by both UIs and clients)
+
+databases:
+  system_db: auth_db       # The key of the primary internal DB used by the service (should match one of the below)
+
+  default_settings:        # (Same as above, re-declared for clarity in this section)
+    pool_size: 20
+    max_overflow: 30
+    pool_pre_ping: true
+    pool_timeout: 15
+  connections:
+    auth_db:
+      env: AUTH_DB_URL       # Environment variable pointing to the main system database (auth, user management)

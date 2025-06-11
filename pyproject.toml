@@ -1,0 +1,18 @@
+[project]
+name = "adminx"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "aiomysql>=0.2.0",
+    "aiosqlite>=0.21.0",
+    "asgiref>=3.8.1",
+    "asyncmy>=0.2.10",
+    "asyncpg>=0.30.0",
+    "fastapi[all]>=0.115.12",
+    "psutil>=7.0.0",
+    "python-json-logger>=3.3.0",
+    "pyyml>=0.0.2",
+    "sqlalchemy>=2.0.41",
+]
