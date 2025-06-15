@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from src.config import docs_config
 from .loader import lifespan
 
+from src.utils import database
+
 
 app = FastAPI(
     debug = docs_config.APP_DEBUG,
@@ -13,6 +15,3 @@ app = FastAPI(
     version=docs_config.APP_VERSION,
     lifespan=lifespan,
 )
-
-
-#  export AUTH_DB_URL="postgresql://postgres:postgres@localhost:5432/test_db"

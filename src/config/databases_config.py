@@ -2,7 +2,7 @@ import os
 from typing import TypedDict
 from logging import getLogger
 
-from .base_config import base_config
+from .base_config import base_config, ROOT
 from .yml_schema.schema_fields.databases import (
     Databases,
     ConnectionSettings,
@@ -10,7 +10,13 @@ from .yml_schema.schema_fields.databases import (
 )
 from src.utils.misc import if_none
 
+
 logger = getLogger(__name__)
+
+LOCAL_DATABASE_DIR = ROOT / "databases"
+
+if not LOCAL_DATABASE_DIR.exists():
+    LOCAL_DATABASE_DIR.mkdir(parents=True, exist_ok=True)
 
 # Load top-level database configuration from base config
 config = if_none(base_config.databases, Databases())
@@ -45,7 +51,7 @@ CONFIG_CONNECTIONS: dict[str, ConnectionSettings] = if_none(config.connections, 
 
 # Final resolved connections and the designated system connection
 CONNECTIONS: list[ConnectionInfo] = []
-SYSTEM_CONNECTION: ConnectionInfo | None = None
+CONFIG_SYSTEM_CONNECTION: ConnectionInfo | None = None
 
 for name, connection in CONFIG_CONNECTIONS.items():
     # Fetch actual database URL from environment using key from config
@@ -71,12 +77,12 @@ for name, connection in CONFIG_CONNECTIONS.items():
 
     # Store as system connection or append to the others
     if name == SYSTEM_DB_CONNECTION_NAME:
-        SYSTEM_CONNECTION = new_connection_info
+        CONFIG_SYSTEM_CONNECTION = new_connection_info
     else:
         CONNECTIONS.append(new_connection_info)
 
 # Ensure the system connection actually exists
-if SYSTEM_CONNECTION is None:
+if CONFIG_SYSTEM_CONNECTION is None:
     logger.critical(
         f"'databases.system_db' is set to '{SYSTEM_DB_CONNECTION_NAME}', "
         f"but no connection by that name is declared under 'databases.{SYSTEM_DB_CONNECTION_NAME}'."
@@ -84,3 +90,23 @@ if SYSTEM_CONNECTION is None:
     raise KeyError(
         f"Missing connection definition for system DB: 'databases.{SYSTEM_DB_CONNECTION_NAME}'"
     )
+
+
+SCHEMA_DATABASE_URL = LOCAL_DATABASE_DIR / "schema.sqlite3"
+
+# Delete file if it exists
+if SCHEMA_DATABASE_URL.exists():
+    os.remove(SCHEMA_DATABASE_URL)
+
+# Build connection config
+CONFIG_SCHEMA_DATABASE: ConnectionInfo = {
+    "config_name": "SCHEMA_DATABASE_CONFIG",
+    "url": f"sqlite:///{SCHEMA_DATABASE_URL.as_posix()}",
+    "pool_size": POOL_SIZE,
+    "max_overflow": MAX_OVERFLOW,
+    "pool_timeout": POOL_TIMEOUT,
+    "pool_pre_ping": POOL_PRE_PING,
+}
+
+
+INTERNAL_DATABASE = ...

@@ -1,9 +1,7 @@
-from typing import Optional, Dict
-from pydantic import BaseModel, model_validator
-from sqlalchemy.engine import make_url, URL
+from typing import TypedDict
 from logging import getLogger
 
-from src.utils.misc import get_env
+from sqlalchemy.engine import make_url, URL
 
 
 DATABASE_DRIVERNAME_MAP = {
@@ -30,7 +28,7 @@ DATABASE_DRIVERNAME_MAP = {
 logger = getLogger(__name__)
 
 
-class UrlConfig(BaseModel):
+class UrlConfig(TypedDict):
     """
     Configuration model for database URL management.
 
@@ -48,39 +46,11 @@ class UrlConfig(BaseModel):
     url: str
 
 
-class UrlUtils:
-    """
-    Utility class for managing and normalizing SQLAlchemy database URLs.
+class ConnectionUrl:
 
-    This class abstracts the logic of determining the database URL from either
-    a direct URL string or an environment variable and ensures the URL uses a
-    supported and consistent SQLAlchemy driver name based on a configurable mapping.
-
-    Features:
-        - Supports URL retrieval from direct input or environment variable.
-        - Validates that the database type is supported and maps driver names.
-        - Exposes both raw URL strings and parsed `URL` objects for flexible use.
-
-    Example usage:
-        config = UrlConfig(
-            initial_url="postgresql://user:pass@localhost/db",
-            database_drivername_map={"postgresql": "postgresql+asyncpg"}
-        )
-        url_utils = UrlUtils(config)
-        print(url_utils.url)  # normalized URL string
-        print(url_utils.make_url)  # parsed sqlalchemy.engine.URL object
-
-    Args:
-        config (UrlConfig): Configuration containing URL and driver mapping info.
-
-    Raises:
-        ValueError: If neither URL nor environment variable contains a valid URL,
-                    or if the database type is unsupported.
-    """
-
-    def __init__(self, config: UrlConfig) -> None:
+    def __init__(self, **config: UrlConfig) -> None:
         self.__url = None
-        self.set_url(config.url)
+        self.set_url(config["url"])
 
     @property
     def database_drivername_map(self) -> dict[str, str]:

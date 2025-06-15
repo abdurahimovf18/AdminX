@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from typing import TypedDict
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 
 
-class EngineConfig(BaseModel, total=False):
+class EngineConfig(TypedDict):
     url: str
     pool_size: int
     pool_timeout: int
@@ -10,9 +10,9 @@ class EngineConfig(BaseModel, total=False):
     pool_pre_ping: bool
 
 
-class EngineUtils:
-    def __init__(self, engine_config: EngineConfig):
-        self.__engine = create_async_engine(**engine_config)
+class ConnectionEngine:
+    def __init__(self, **config: EngineConfig):
+        self.__engine = create_async_engine(**config)
 
     @property
     def engine(self) -> AsyncEngine:

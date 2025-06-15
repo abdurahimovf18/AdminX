@@ -11,8 +11,10 @@ dependencies = [
     "asyncmy>=0.2.10",
     "asyncpg>=0.30.0",
     "fastapi[all]>=0.115.12",
+    "orjson>=3.10.18",
     "psutil>=7.0.0",
     "python-json-logger>=3.3.0",
     "pyyml>=0.0.2",
     "sqlalchemy>=2.0.41",
+    "xxhash>=3.5.0",
 ]
